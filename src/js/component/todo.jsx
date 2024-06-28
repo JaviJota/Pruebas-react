@@ -45,7 +45,7 @@ const List = () => {
       if (data.todos) {
         setTodos(data.todos);
       } else {
-        setTodos([]); // Asegúrate de manejar el caso cuando no hay tareas
+        setTodos([]);
       }
     } catch (error) {
       console.log("Error registering new user ----->" + error);
