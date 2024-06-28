@@ -28,10 +28,12 @@ const List = () => {
           body: JSON.stringify(),
         }
       );
+      if (!resp.ok) throw new Error("Error registering new user");
       const data = await resp.json();
       console.log(data);
     } catch (error) {
       console.log("Error registering new user ----->" + error);
+      alert("Error registering new user");
     }
   };
 
@@ -41,14 +43,12 @@ const List = () => {
       const resp = await fetch(
         "https://playground.4geeks.com/todo/users/" + currentUser
       );
+      if (!resp.ok) throw new Error("User doesn't exist");
       const data = await resp.json();
-      if (data.todos) {
-        setTodos(data.todos);
-      } else {
-        setTodos([]);
-      }
+      setTodos(data.todos);
     } catch (error) {
-      console.log("Error registering new user ----->" + error);
+      alert("User doesn't exist");
+      console.log("User doesn't exist ----->" + error);
     }
   };
 
@@ -69,11 +69,13 @@ const List = () => {
           }),
         }
       );
+      if (!resp.ok) throw new Error("Error adding new task");
       const data = await resp.json();
       console.log(data);
       getUserTasks();
       setTaskInputValue("");
     } catch (error) {
+      alert("Error adding new task");
       console.log("Error adding new task ----->" + error);
     }
   };
@@ -97,14 +99,18 @@ const List = () => {
           },
         }
       );
+      if (!resp.ok) throw new Error("Error deleting task");
       getUserTasks();
     } catch (error) {
+      alert("Error deleting task");
       console.log("Error deleting task ----->" + error);
     }
   };
-  
-  const deleteAllTasks = () => {
-    todos.map((todo) => deleteTask(todo.id))
+
+  const deleteAllTasks = async () => {
+    await deleteUser();
+    await createUser();
+    getUserTasks();
   };
 
   // ELIMINAR USUARIO DE API
@@ -120,25 +126,16 @@ const List = () => {
           body: JSON.stringify(),
         }
       );
-
+      if (!resp.ok) throw new Error("Error deleting user");
       setCurrentUser("");
       setTodos([]);
     } catch (error) {
+      alert("Error deleting user");
       console.log("Error deleting user ----->" + error);
     }
   };
 
   // IMPRIMIR LISTA DE TAREAS EN PANTALLA
-  const printTasks = () => {
-    return todos.map((todo, index) => (
-      <li className="list-group-item" key={index} id={todo.id}>
-        {todo.label}{" "}
-        <button className="btn btn-danger" onClick={() => deleteTask(todo.id)}>
-          Delete task
-        </button>
-      </li>
-    ));
-  };
 
   return (
     <>
@@ -171,10 +168,29 @@ const List = () => {
         />
       </div>
       <div>
-        <ul className="list-group mt-3">{printTasks()}</ul>
+        <ul className="list-group mt-3">
+          {todos &&
+            todos.map((todo, index) => (
+              <li className="list-group-item" key={index} id={todo.id}>
+                {todo.label}{" "}
+                <button
+                  className="btn btn-danger"
+                  onClick={() => deleteTask(todo.id)}
+                >
+                  Delete task
+                </button>
+              </li>
+            ))}
+        </ul>
       </div>
       {/* Mostrar botón para eliminar todas las tareas SOLO si existe alguna tarea*/}
-      {todos.length > 0 ? <button className="btn btn-danger mt-5" onClick={deleteAllTasks}>Delete all tasks</button> : ''}
+      {todos && todos.length > 0 ? (
+        <button className="btn btn-danger mt-5" onClick={deleteAllTasks}>
+          Delete all tasks
+        </button>
+      ) : (
+        ""
+      )}
     </>
   );
 };
