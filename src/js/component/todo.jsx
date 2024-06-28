@@ -173,6 +173,7 @@ const List = () => {
       <div>
         <ul className="list-group mt-3">{printTasks()}</ul>
       </div>
+      {/* Mostrar botón para eliminar todas las tareas SOLO si existe alguna tarea*/}
       {todos.length > 0 ? <button className="btn btn-danger mt-5" onClick={deleteAllTasks}>Delete all tasks</button> : ''}
     </>
   );
